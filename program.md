@@ -521,6 +521,12 @@ Once block sizes are tuned, memory is usually the bottleneck.
 - TF32 tensor cores (19.5 TFLOPS).
 - Fine-grained structured sparsity (2:4).
 
+**CMP 170HX (Ampere, SM80 -- GA100 mining card):**
+- Same `sm_80` ISA as A100: `cp.async`, TF32 tensor cores, and 2:4 sparsity all compile and run.
+- Tensor/FMA throughput is gated (~50 TFLOPS FP16 vs A100's 312) -- treat kernels as memory-bound: prefer fewer pipeline stages and memory-optimal layouts over compute-heavy tiling.
+- Tiny 8 MB L2 (A100 has 40 MB) -- don't rely on large-tile L2 reuse; smaller blocks tile better.
+- Host link runs PCIe 2.0 on this unlocked card (stock is a throttled 1.1 x4) -- still slow vs a modern x16 GPU, so keep data device-resident and avoid host<->device transfers in the hot loop.
+
 **L40S / L4 / RTX (Ada Lovelace / Ampere consumer):**
 - Smaller shared memory, fewer SMs. Use smaller block sizes, fewer stages.
 - L40S: 142 SMs, good FP16 throughput.
@@ -671,6 +677,11 @@ asm volatile("cp.async.wait_group 0;");
 - `cp.async`: async global-to-shared memory copies (non-blocking).
 - TF32 tensor cores: 19.5 TFLOPS with tf32 precision.
 - Fine-grained structured sparsity (2:4 pattern).
+
+**CMP 170HX (Ampere, SM80 -- GA100 mining card):**
+- Same `sm_80` ISA as A100: `cp.async`, TF32, and 2:4 sparsity all compile -- no code changes vs A100.
+- Tensor/FMA throughput is gated (~50 TFLOPS FP16 vs A100's 312) -- kernels go memory-bound early; optimize for bandwidth, not FLOPs.
+- Tiny 8 MB L2 (vs A100's 40 MB); host link runs PCIe 2.0 on this unlocked card (stock 1.1 x4) -- use smaller tiles and keep data device-resident.
 
 **Ada Lovelace (SM89, RTX 4090/L40S):**
 - FP8 tensor cores for inference.

@@ -236,6 +236,10 @@ Built by [RightNow AI](https://www.rightnowai.co). For enterprise GPU optimizati
 
 ## Changelog
 
+### v1.4.0
+- NVIDIA CMP 170HX support: GA100 mining card (`sm_80`) added to the GPU database with correct roofline specs (50.5 TFLOPS FP16 gated peak, 1493 GB/s bandwidth, 8 MB L2)
+- Documented CMP 170HX in the `program.md` architecture playbook (gated compute, tiny L2, slow PCIe host link)
+
 ### v1.3.0
 - AMD ROCm GPU support: MI300X, MI325X, MI350X, MI355X detection and specs (thanks [@andyluo7](https://github.com/andyluo7))
 - Fixed `verify.py` SyntaxError on Python 3.13+

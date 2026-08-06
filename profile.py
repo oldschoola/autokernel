@@ -105,6 +105,9 @@ def _fallback_detect_gpu() -> GPUSpec:
         "A100-SXM":  (312.0, 2039.0, 40.0),
         "A100-PCIE": (312.0, 1935.0, 40.0),
         "A100":      (312.0, 2039.0, 40.0),
+        # NVIDIA CMP 170HX -- GA100 (sm_80), 70 SMs, 8GB HBM2e. FP16 (50.5) is the
+        # gated/achievable tensor peak (FMA-throttled mining card); bandwidth is ungated.
+        "CMP 170HX": (50.5,  1493.0, 8.0),
         "L40S":      (362.05, 864.0, 48.0),
         "L4":        (121.0, 300.0, 48.0),
         "A10":       (125.0, 600.0, 6.0),

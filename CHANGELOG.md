@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.4.0 -- 2026-08-04
+
+### NVIDIA CMP 170HX Support (sm_80)
+
+- Added NVIDIA CMP 170HX to the GPU database in `bench.py` and `profile.py` with correct roofline specs: 50.5 TFLOPS FP16, 1493 GB/s memory bandwidth, 8 MB L2 cache
+- The CMP 170HX is a headless GA100 mining card that reports compute capability 8.0 (`sm_80`) -- the same ISA as the A100. The existing `-gencode arch=compute_80,code=sm_80` auto-detection in `kernels/cuda/_compile.py` already targets it correctly, so no compile-flag changes were needed
+- FP16 peak is deliberately set to the *gated/achievable* tensor throughput (~50 TFLOPS), not the ~200 the 70 GA100 SMs would imply: NVIDIA throttles FMA on this card, so the honest roofline ceiling is memory bandwidth (1493 GB/s, which is not gated). This keeps `pct_peak` and the memory-bound/compute-bound classification meaningful instead of making every kernel look like it is failing to reach peak
+- The PCIe host link (stock: throttled PCIe 1.1 x4; PCIe 2.0 on VBIOS-unlocked cards) does not affect the roofline -- kernels operate on data already resident in HBM2e -- but it is still slow, so `program.md` advises keeping data device-resident
+- Added CMP 170HX architecture notes to `program.md` (Triton + CUDA Tier 5): gated compute -> favor memory-bound strategies, tiny 8 MB L2 -> smaller tiles, slow PCIe host link -> keep data device-resident
+- Verified via simulated device detection (spec-table lookup + roofline classification); not yet validated on physical silicon
+
 ## v1.3.0 -- 2026-03-13
 
 ### AMD ROCm GPU Support (PR #3 by @andyluo7)
